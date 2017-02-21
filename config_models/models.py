@@ -10,10 +10,18 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.utils import model_meta
 
-
+# Config model values are cached. The caching backend configuration used has implications for how the
+# values are changed in an active release. When a new value is set, its cached value is deleted.
+# But, depending on the cache backend configuration, the old value may still exist in some caches.
 try:
+    # Use the Django settings-configured cache, which could be:
+    #  - memcache or another external networked cache (per-cluster)
+    #  - file cache (per-machine)
+    #  - local memory cache (per-process)
+    #  - other
     cache = caches['configuration']  # pylint: disable=invalid-name
 except InvalidCacheBackendError:
+    # If no caches configured, use the default local-memory (per-process) cache.
     from django.core.cache import cache  # pylint: disable=ungrouped-imports
 
 
